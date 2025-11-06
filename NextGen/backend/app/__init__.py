@@ -1,5 +1,6 @@
 """Flask application factory."""
-from flask import Flask
+import os
+from flask import Flask, send_from_directory
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_mail import Mail
@@ -21,6 +22,12 @@ def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
+    # Create upload folders if they don't exist
+    upload_folder = app.config['UPLOAD_FOLDER']
+    os.makedirs(upload_folder, exist_ok=True)
+    os.makedirs(os.path.join(upload_folder, 'avatars'), exist_ok=True)
+    os.makedirs(os.path.join(upload_folder, 'documents'), exist_ok=True)
+
     # Initialize extensions with app
     jwt.init_app(app)
     mail.init_app(app)
@@ -29,8 +36,11 @@ def create_app(config_name='development'):
     # Register database teardown
     app.teardown_appcontext(close_db)
 
-    # Configure CORS
-    CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ORIGINS']}})
+    # Configure CORS (allow file uploads)
+    CORS(app, resources={
+        r"/api/*": {"origins": app.config['CORS_ORIGINS']},
+        r"/uploads/*": {"origins": app.config['CORS_ORIGINS']}
+    })
 
     # Initialize API documentation
     api = Api(
@@ -53,6 +63,12 @@ def create_app(config_name='development'):
     @app.route('/api/health')
     def health():
         return {'status': 'healthy', 'message': 'Chronicle API is running'}
+
+    # Serve uploaded files
+    @app.route('/uploads/<path:filename>')
+    def uploaded_file(filename):
+        """Serve uploaded files."""
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     # Initialize database indexes
     with app.app_context():

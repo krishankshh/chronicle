@@ -8,6 +8,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pymongo import MongoClient
 from datetime import datetime
 import bcrypt
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 def create_admin_user():
     """Create a default admin user."""
@@ -15,18 +19,29 @@ def create_admin_user():
     print("Chronicle Database Setup")
     print("=" * 60)
 
+    # Get MongoDB URI from environment
+    mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
+    db_name = os.getenv('MONGO_DB_NAME', 'chronicle_db')
+
+    print(f"\n🔗 Connecting to MongoDB...")
+    print(f"   URI: {mongo_uri.split('@')[1] if '@' in mongo_uri else mongo_uri}")
+    print(f"   Database: {db_name}")
+
     # Connect to MongoDB
     try:
-        client = MongoClient('mongodb://localhost:27017')
-        db = client['chronicle_db']
-        print("✅ Connected to MongoDB")
+        client = MongoClient(mongo_uri)
+        db = client[db_name]
+        # Test connection
+        client.server_info()
+        print("✅ Connected to MongoDB successfully!")
     except Exception as e:
-        print(f"❌ Failed to connect to MongoDB: {e}")
-        print("\nMake sure MongoDB is running:")
-        print("   - Install: brew install mongodb-community (Mac)")
-        print("   - Install: sudo apt-get install mongodb (Ubuntu)")
-        print("   - Start: brew services start mongodb-community (Mac)")
-        print("   - Start: sudo systemctl start mongod (Ubuntu)")
+        print(f"\n❌ Failed to connect to MongoDB: {e}")
+        print("\nTroubleshooting:")
+        print("   1. Check your MONGO_URI in .env file")
+        print("   2. For MongoDB Atlas: Verify credentials and network access")
+        print("   3. For Local MongoDB: Make sure it's running")
+        print("      - macOS: brew services start mongodb-community")
+        print("      - Ubuntu: sudo systemctl start mongod")
         sys.exit(1)
 
     # Check if admin already exists

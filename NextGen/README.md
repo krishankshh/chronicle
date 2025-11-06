@@ -15,25 +15,18 @@ Complete modern recreation of Chronicle College Social Network using **React + V
 - ✅ Simple Python commands (no Docker required!)
 - ✅ Complete API documentation (Swagger)
 
-## 🚀 Quick Start (3 Simple Steps!)
+## 🚀 Quick Start (2 Simple Steps!)
+
+**🌐 MongoDB is already in the cloud! No installation needed!**
 
 See **[SIMPLE-START.md](SIMPLE-START.md)** for the easiest setup.
 
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
-- MongoDB
+- ~~MongoDB~~ ✅ Already hosted in the cloud (MongoDB Atlas)!
 
-### Step 1: Start MongoDB
-```bash
-# macOS
-brew services start mongodb-community
-
-# Ubuntu/Linux
-sudo systemctl start mongod
-```
-
-### Step 2: Start Backend
+### Step 1: Start Backend
 ```bash
 cd NextGen/backend
 
@@ -49,7 +42,7 @@ python run.py
 
 ✅ Backend running on: http://localhost:5000
 
-### Step 3: Start Frontend (in new terminal)
+### Step 2: Start Frontend (in new terminal)
 ```bash
 cd NextGen/frontend
 
@@ -379,7 +372,8 @@ Default admin credentials:
 
 ## 📚 Additional Documentation
 
-- **[SIMPLE-START.md](SIMPLE-START.md)** - Super simple 3-step setup
+- **[SIMPLE-START.md](SIMPLE-START.md)** - Super simple 2-step setup
+- **[MONGODB-ATLAS.md](MONGODB-ATLAS.md)** - All about your cloud database
 - **[START.md](START.md)** - Detailed setup instructions
 - **[10-PHASE-RECREATION-PLAN.md](10-PHASE-RECREATION-PLAN.md)** - Complete 10-phase roadmap
 

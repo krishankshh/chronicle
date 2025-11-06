@@ -34,6 +34,7 @@ subject_update_model = api.model('SubjectUpdate', {
 })
 
 
+@api.route('')
 @api.route('/')
 class SubjectList(Resource):
     """Subject list and creation."""

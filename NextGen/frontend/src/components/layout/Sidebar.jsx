@@ -39,8 +39,11 @@ export default function Sidebar() {
     { name: 'Subjects', href: '/subjects', icon: FileText },
     { name: 'Study Materials', href: '/materials', icon: FileText },
     { name: 'Quizzes', href: '/quizzes', icon: ClipboardList },
+    { name: 'Manage Materials', href: '/admin/materials', icon: ClipboardList },
+    { name: 'Manage Quizzes', href: '/admin/quizzes', icon: ClipboardList },
     { name: 'Discussions', href: '/discussions', icon: MessageSquare },
     { name: 'Notices', href: '/notices', icon: Calendar },
+    { name: 'Manage Notices', href: '/admin/notices', icon: FileText },
   ]
 
   const adminNav = [
@@ -52,8 +55,11 @@ export default function Sidebar() {
     { name: 'Subjects', href: '/subjects', icon: FileText },
     { name: 'Study Materials', href: '/materials', icon: FileText },
     { name: 'Quizzes', href: '/quizzes', icon: ClipboardList },
+    { name: 'Manage Materials', href: '/admin/materials', icon: ClipboardList },
+    { name: 'Manage Quizzes', href: '/admin/quizzes', icon: ClipboardList },
     { name: 'Discussions', href: '/discussions', icon: MessageSquare },
     { name: 'Notices', href: '/notices', icon: Calendar },
+    { name: 'Manage Notices', href: '/admin/notices', icon: FileText },
   ]
 
   const navItems = role === 'admin' ? adminNav : role === 'staff' ? staffNav : studentNav
@@ -63,7 +69,9 @@ export default function Sidebar() {
       <nav className="p-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon
-          const isActive = location.pathname === item.href
+          const isActive =
+            location.pathname === item.href ||
+            (location.pathname.startsWith(item.href) && item.href !== '/' && location.pathname.charAt(item.href.length) === '/')
 
           return (
             <Link

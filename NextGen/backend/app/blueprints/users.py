@@ -215,6 +215,7 @@ class UserPasswordChange(Resource):
         }, 200
 
 
+@api.route('')
 @api.route('/')
 class UserList(Resource):
     """User list and creation."""

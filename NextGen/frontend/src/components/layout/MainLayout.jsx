@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 import Sidebar from './Sidebar'
+import ChatDock from '../../features/chat/ChatDock'
 
 export default function MainLayout() {
   return (
@@ -14,6 +15,7 @@ export default function MainLayout() {
           </div>
         </main>
       </div>
+      <ChatDock />
     </div>
   )
 }

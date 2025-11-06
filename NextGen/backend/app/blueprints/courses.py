@@ -31,6 +31,7 @@ course_update_model = api.model('CourseUpdate', {
 })
 
 
+@api.route('')
 @api.route('/')
 class CourseList(Resource):
     """Course list and creation."""

@@ -19,6 +19,7 @@ export default {
           800: '#075985',
           900: '#0c4a6e',
         },
+        border: '#e5e7eb',
       },
     },
   },

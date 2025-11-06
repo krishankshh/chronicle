@@ -6,6 +6,7 @@ from werkzeug.datastructures import FileStorage
 
 from app.db import get_db
 from app.models.student import StudentHelper
+from app.models.timeline import TimelinePostHelper
 from app.utils.decorators import student_required, admin_required
 from app.utils.file_handler import FileHandler
 from bson import ObjectId
@@ -168,6 +169,7 @@ class StudentAvatar(Resource):
             return {'success': False, 'message': f'Upload failed: {str(e)}'}, 500
 
 
+@api.route('')
 @api.route('/')
 class StudentList(Resource):
     """Student list and creation (Admin only)."""
@@ -362,4 +364,56 @@ class StudentDetail(Resource):
         return {
             'success': True,
             'message': 'Student deleted successfully'
+        }, 200
+
+
+@api.route('/<string:student_id>/timeline')
+class StudentTimeline(Resource):
+    """Timeline posts authored by the specified student."""
+
+    @api.doc(params={
+        'page': 'Page number (default 1)',
+        'limit': 'Items per page (default 10, max 50)',
+    })
+    @jwt_required()
+    def get(self, student_id):
+        db = get_db()
+        student = StudentHelper.find_by_id(db, student_id)
+        if not student:
+            return {'success': False, 'message': 'Student not found'}, 404
+
+        claims = get_jwt()
+        current_user_id = claims.get('user_id')
+        role = claims.get('role')
+
+        try:
+            page = int(request.args.get('page', 1))
+        except (TypeError, ValueError):
+            page = 1
+        try:
+            limit = int(request.args.get('limit', 10))
+        except (TypeError, ValueError):
+            limit = 10
+        limit = max(1, min(limit, 50))
+
+        total, posts = TimelinePostHelper.list_user_posts(
+            db,
+            student_id,
+            page=page,
+            limit=limit,
+            viewer_role=role,
+            viewer_id=current_user_id,
+        )
+        serialized = [
+            TimelinePostHelper.to_dict(post, current_user_id=current_user_id) for post in posts
+        ]
+        has_more = page * limit < total
+        return {
+            'success': True,
+            'page': page,
+            'limit': limit,
+            'total': total,
+            'has_more': has_more,
+            'next_page': page + 1 if has_more else None,
+            'posts': serialized,
         }, 200

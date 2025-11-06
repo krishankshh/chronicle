@@ -14,6 +14,7 @@ const Badge = ({
     warning: 'bg-yellow-100 text-yellow-800',
     danger: 'bg-red-100 text-red-800',
     info: 'bg-cyan-100 text-cyan-800',
+    outline: 'border border-gray-200 text-gray-700 bg-white',
   };
 
   const sizes = {

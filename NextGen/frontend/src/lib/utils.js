@@ -54,3 +54,25 @@ export function truncate(text, length = 100) {
   if (!text) return ''
   return text.length > length ? `${text.substring(0, length)}...` : text
 }
+
+/**
+ * Format date with time
+ */
+export function formatDateTime(date) {
+  if (!date) return ''
+  return new Date(date).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+/**
+ * Capitalize first letter of string
+ */
+export function capitalize(text) {
+  if (!text) return ''
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}

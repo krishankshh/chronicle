@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import create_app
+from app.extensions import socketio
 
 def main():
     """Run the Flask application."""
@@ -27,7 +28,8 @@ def main():
     print("=" * 60)
 
     try:
-        app.run(
+        socketio.run(
+            app,
             host='0.0.0.0',
             port=5000,
             debug=True,

@@ -2,7 +2,6 @@
  * Reusable Modal component
  */
 import { useEffect } from 'react';
-import Button from './Button';
 
 const Modal = ({
   isOpen,

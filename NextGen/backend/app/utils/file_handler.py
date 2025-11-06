@@ -11,6 +11,7 @@ class FileHandler:
 
     ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     ALLOWED_DOCUMENT_EXTENSIONS = {'pdf', 'doc', 'docx', 'rtf'}
+    ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'mov', 'mkv', 'avi', 'webm'}
     MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
     MAX_DOCUMENT_SIZE = 10 * 1024 * 1024  # 10MB
     AVATAR_SIZE = (300, 300)  # Avatar dimensions
@@ -25,10 +26,15 @@ class FileHandler:
 
         if file_type == 'image':
             return ext in FileHandler.ALLOWED_IMAGE_EXTENSIONS
-        elif file_type == 'document':
+        if file_type == 'document':
             return ext in FileHandler.ALLOWED_DOCUMENT_EXTENSIONS
-        else:
-            return ext in (FileHandler.ALLOWED_IMAGE_EXTENSIONS | FileHandler.ALLOWED_DOCUMENT_EXTENSIONS)
+        if file_type == 'video':
+            return ext in FileHandler.ALLOWED_VIDEO_EXTENSIONS
+        return ext in (
+            FileHandler.ALLOWED_IMAGE_EXTENSIONS
+            | FileHandler.ALLOWED_DOCUMENT_EXTENSIONS
+            | FileHandler.ALLOWED_VIDEO_EXTENSIONS
+        )
 
     @staticmethod
     def generate_filename(original_filename):
@@ -48,6 +54,30 @@ class FileHandler:
 
         filepath = os.path.join(upload_folder, filename)
         file.save(filepath)
+
+        return filename
+
+    @staticmethod
+    def save_image(file, upload_folder, filename=None, max_size=(1200, 1200), quality=85):
+        """Save and optimize an image file."""
+        if not filename:
+            filename = FileHandler.generate_filename(file.filename)
+
+        # Read file data
+        file.stream.seek(0)
+        image_data = file.read()
+
+        optimized_data = FileHandler.optimize_image(image_data, max_size=max_size, quality=quality)
+
+        # Ensure upload folder exists
+        os.makedirs(upload_folder, exist_ok=True)
+
+        filepath = os.path.join(upload_folder, filename)
+        with open(filepath, 'wb') as f:
+            f.write(optimized_data)
+
+        # Reset file pointer for potential further use
+        file.stream.seek(0)
 
         return filename
 

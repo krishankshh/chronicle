@@ -128,7 +128,7 @@ export default function StudentLogin() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">Don't have an account?</span>
+              <span className="px-4 bg-white text-gray-500">{"Don't have an account?"}</span>
             </div>
           </div>
 
@@ -146,7 +146,7 @@ export default function StudentLogin() {
               to="/staff-login"
               className="text-sm text-gray-600 hover:text-gray-900"
             >
-              Staff/Admin Login →
+              Staff/Admin Login
             </Link>
           </div>
         </div>

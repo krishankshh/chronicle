@@ -8,7 +8,9 @@ import {
   FileText,
   ClipboardList,
   MessagesSquare,
-  Image
+  Image,
+  UserCircle,
+  UserCog
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import useAuthStore from '../../store/authStore'
@@ -19,6 +21,7 @@ export default function Sidebar() {
 
   const studentNav = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'My Profile', href: '/profile/student', icon: UserCircle },
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Study Materials', href: '/materials', icon: FileText },
     { name: 'Quizzes', href: '/quizzes', icon: ClipboardList },
@@ -30,6 +33,7 @@ export default function Sidebar() {
 
   const staffNav = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'My Profile', href: '/profile/user', icon: UserCircle },
     { name: 'Students', href: '/students', icon: Users },
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Study Materials', href: '/materials', icon: FileText },
@@ -40,8 +44,9 @@ export default function Sidebar() {
 
   const adminNav = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Users', href: '/users', icon: Users },
-    { name: 'Students', href: '/students', icon: Users },
+    { name: 'My Profile', href: '/profile/user', icon: UserCircle },
+    { name: 'Manage Students', href: '/admin/students', icon: Users },
+    { name: 'Manage Users', href: '/admin/users', icon: UserCog },
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Study Materials', href: '/materials', icon: FileText },
     { name: 'Quizzes', href: '/quizzes', icon: ClipboardList },

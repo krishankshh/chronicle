@@ -2,11 +2,21 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import useAuthStore from './store/authStore'
 
-// Pages
+// Auth Pages
 import StudentLogin from './features/auth/StudentLogin'
 import StaffLogin from './features/auth/StaffLogin'
 import StudentRegister from './features/auth/StudentRegister'
+
+// Dashboard
 import Dashboard from './features/dashboard/Dashboard'
+
+// Profile Pages (Phase 2)
+import StudentProfile from './features/profile/StudentProfile'
+import UserProfile from './features/profile/UserProfile'
+
+// Admin Pages (Phase 2)
+import StudentManagement from './features/admin/StudentManagement'
+import UserManagement from './features/admin/UserManagement'
 
 // Layout
 import MainLayout from './components/layout/MainLayout'
@@ -43,6 +53,15 @@ function App() {
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+
+        {/* Phase 2: Profile Management */}
+        <Route path="profile/student" element={<StudentProfile />} />
+        <Route path="profile/user" element={<UserProfile />} />
+
+        {/* Phase 2: Admin Management (Admin only) */}
+        <Route path="admin/students" element={<StudentManagement />} />
+        <Route path="admin/users" element={<UserManagement />} />
+
         {/* More routes will be added in subsequent phases */}
       </Route>
 

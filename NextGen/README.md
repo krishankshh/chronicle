@@ -12,19 +12,86 @@ Complete modern recreation of Chronicle College Social Network using **React + V
 - ✅ MongoDB database with indexed collections
 - ✅ Modern React UI with Tailwind CSS
 - ✅ Responsive dashboard
-- ✅ Docker containerization
+- ✅ Simple Python commands (no Docker required!)
 - ✅ Complete API documentation (Swagger)
+
+## 🚀 Quick Start (3 Simple Steps!)
+
+See **[SIMPLE-START.md](SIMPLE-START.md)** for the easiest setup.
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- MongoDB
+
+### Step 1: Start MongoDB
+```bash
+# macOS
+brew services start mongodb-community
+
+# Ubuntu/Linux
+sudo systemctl start mongod
+```
+
+### Step 2: Start Backend
+```bash
+cd NextGen/backend
+
+# Install dependencies (first time only)
+pip install -r requirements.txt
+
+# Setup database (first time only)
+python setup.py
+
+# Start backend
+python run.py
+```
+
+✅ Backend running on: http://localhost:5000
+
+### Step 3: Start Frontend (in new terminal)
+```bash
+cd NextGen/frontend
+
+# Install dependencies (first time only)
+npm install
+
+# Start frontend
+npm run dev
+```
+
+✅ Frontend running on: http://localhost:5173
+
+---
+
+## 🎉 Access the Application
+
+### Student
+1. Go to http://localhost:5173/register
+2. Register a new student account
+3. Login at http://localhost:5173/login
+
+### Admin/Staff
+1. Go to http://localhost:5173/staff-login
+2. Login with:
+   - **Login ID:** `admin001`
+   - **Password:** `admin123`
+
+### API Documentation
+- **Swagger Docs:** http://localhost:5000/api/docs
+- **Health Check:** http://localhost:5000/api/health
+
+---
 
 ## Technology Stack
 
 ### Backend
 - **Python 3.11** with **Flask 3.0**
 - **MongoDB 6** (NoSQL database)
-- **Redis** (caching & sessions)
+- **Redis** (optional - caching)
 - **Flask-JWT-Extended** (JWT authentication)
 - **Flask-RESTX** (REST API with Swagger docs)
 - **Bcrypt** (password hashing)
-- **Docker** (containerization)
 
 ### Frontend
 - **React 18.2**
@@ -36,276 +103,101 @@ Complete modern recreation of Chronicle College Social Network using **React + V
 - **React Hook Form + Zod** (form validation)
 - **Lucide React** (icons)
 
-## Prerequisites
+---
 
-- **Docker** and **Docker Compose** (recommended)
-- **Node.js 18+** and **npm** (for local development)
-- **Python 3.11+** (for local backend development)
-- **MongoDB 6+** (if running without Docker)
-
-## Quick Start with Docker (Recommended)
-
-### 1. Clone and Navigate
-```bash
-cd NextGen
-```
-
-### 2. Create Environment Files
-
-**Backend (.env):**
-```bash
-cd backend
-cp .env.example .env
-# Edit .env if needed (defaults work with Docker)
-cd ..
-```
-
-**Frontend (.env):**
-```bash
-cd frontend
-cp .env.example .env
-# Edit frontend/.env:
-echo "VITE_API_BASE_URL=http://localhost:5000/api" > .env
-cd ..
-```
-
-### 3. Start All Services
-```bash
-docker-compose up --build
-```
-
-This will start:
-- **MongoDB** on port 27017
-- **Redis** on port 6379
-- **Backend API** on port 5000
-- **Frontend** on port 5173
-
-### 4. Access the Application
-
-- **Frontend:** http://localhost:5173
-- **API Documentation (Swagger):** http://localhost:5000/api/docs
-- **API Health Check:** http://localhost:5000/api/health
-
-### 5. Create Test Accounts
-
-**Create Admin User (via MongoDB):**
-```bash
-docker exec -it chronicle_mongo mongosh chronicle_db
-```
-
-In MongoDB shell:
-```javascript
-db.users.insertOne({
-  login_id: "admin001",
-  name: "Admin User",
-  email: "admin@chronicle.com",
-  password_hash: "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIvAprzZ3.", // password: admin123
-  user_type: "Admin",
-  user_img: null,
-  status: "Active",
-  created_at: new Date(),
-  updated_at: new Date()
-})
-
-// Or create a staff user
-db.users.insertOne({
-  login_id: "staff001",
-  name: "Staff Member",
-  email: "staff@chronicle.com",
-  password_hash: "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIvAprzZ3.", // password: admin123
-  user_type: "Staff",
-  user_img: null,
-  status: "Active",
-  created_at: new Date(),
-  updated_at: new Date()
-})
-```
-
-**Register Student (via UI):**
-- Go to http://localhost:5173/register
-- Fill in the registration form
-- Login at http://localhost:5173/login
-
-## Local Development (Without Docker)
-
-### Backend Setup
-
-1. **Install MongoDB and Redis locally**
-
-2. **Setup Python environment:**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-3. **Configure environment:**
-```bash
-cp .env.example .env
-# Edit .env for local development:
-# MONGO_URI=mongodb://localhost:27017
-# MONGO_DB_NAME=chronicle_db
-# REDIS_URL=redis://localhost:6379/0
-```
-
-4. **Run the backend:**
-```bash
-python wsgi.py
-```
-
-Backend will run on http://localhost:5000
-
-### Frontend Setup
-
-1. **Install dependencies:**
-```bash
-cd frontend
-npm install
-```
-
-2. **Configure environment:**
-```bash
-cp .env.example .env
-# Edit .env:
-# VITE_API_BASE_URL=http://localhost:5000/api
-```
-
-3. **Run the frontend:**
-```bash
-npm run dev
-```
-
-Frontend will run on http://localhost:5173
-
-## API Endpoints
-
-### Authentication
-
-#### Student Registration
-```http
-POST /api/auth/student/register
-Content-Type: application/json
-
-{
-  "roll_no": "CS2021001",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "course": "BCA",
-  "semester": 1,
-  "batch": "2021-2024",
-  "mob_no": "+1234567890"
-}
-```
-
-#### Student Login
-```http
-POST /api/auth/student/login
-Content-Type: application/json
-
-{
-  "roll_no": "CS2021001",
-  "password": "password123"
-}
-
-Response:
-{
-  "success": true,
-  "message": "Login successful",
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-  "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-  "user": { ... }
-}
-```
-
-#### Staff/Admin Login
-```http
-POST /api/auth/staff/login
-Content-Type: application/json
-
-{
-  "login_id": "admin001",
-  "password": "admin123"
-}
-```
-
-#### Get Current User
-```http
-GET /api/auth/me
-Authorization: Bearer <access_token>
-```
-
-#### Refresh Token
-```http
-POST /api/auth/refresh
-Authorization: Bearer <refresh_token>
-```
-
-#### Logout
-```http
-POST /api/auth/logout
-Authorization: Bearer <access_token>
-```
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 NextGen/
 ├── backend/                      # Flask Backend
 │   ├── app/
-│   │   ├── __init__.py          # Flask app factory
-│   │   ├── config.py            # Configuration
-│   │   ├── db.py                # MongoDB connection
-│   │   ├── models/              # Model helpers
-│   │   │   ├── student.py       # Student helper
-│   │   │   └── user.py          # User helper
 │   │   ├── blueprints/          # API endpoints
 │   │   │   ├── auth.py          # Authentication
 │   │   │   ├── students.py      # Student routes
 │   │   │   └── users.py         # User routes
-│   │   └── utils/               # Utilities
-│   │       └── decorators.py    # Auth decorators
+│   │   ├── models/              # MongoDB helpers
+│   │   │   ├── student.py       # Student model
+│   │   │   └── user.py          # User model
+│   │   ├── utils/               # Utilities
+│   │   │   └── decorators.py    # Auth decorators
+│   │   ├── db.py                # MongoDB connection
+│   │   ├── config.py            # Configuration
+│   │   └── __init__.py          # App factory
 │   ├── requirements.txt         # Python dependencies
-│   ├── wsgi.py                  # WSGI entry point
-│   ├── Dockerfile               # Backend container
-│   └── .env.example             # Environment template
+│   ├── run.py                   # Start server (EASY!)
+│   ├── setup.py                 # Database setup
+│   └── .env                     # Configuration
 │
-├── frontend/                    # React Frontend
+├── frontend/                     # React Frontend
 │   ├── src/
 │   │   ├── features/            # Feature modules
-│   │   │   ├── auth/            # Auth pages
-│   │   │   │   ├── StudentLogin.jsx
-│   │   │   │   ├── StaffLogin.jsx
-│   │   │   │   └── StudentRegister.jsx
+│   │   │   ├── auth/            # Login/Register pages
 │   │   │   └── dashboard/       # Dashboard
-│   │   │       └── Dashboard.jsx
 │   │   ├── components/          # Reusable components
 │   │   │   └── layout/          # Layout components
-│   │   │       ├── Header.jsx
-│   │   │       ├── Sidebar.jsx
-│   │   │       ├── MainLayout.jsx
-│   │   │       └── ProtectedRoute.jsx
-│   │   ├── lib/                 # Libraries
-│   │   │   ├── api.js           # Axios instance
-│   │   │   └── utils.js         # Utilities
+│   │   ├── lib/                 # Utilities
+│   │   │   ├── api.js           # Axios client
+│   │   │   └── utils.js         # Helper functions
 │   │   ├── store/               # State management
 │   │   │   └── authStore.js     # Auth store (Zustand)
 │   │   ├── styles/              # Global styles
-│   │   │   └── index.css        # Tailwind CSS
-│   │   ├── App.jsx              # Main app component
-│   │   └── main.jsx             # Entry point
+│   │   └── App.jsx              # Main app
 │   ├── package.json             # Dependencies
-│   ├── vite.config.js           # Vite config
-│   ├── tailwind.config.js       # Tailwind config
-│   ├── Dockerfile               # Frontend container
-│   └── .env.example             # Environment template
+│   └── .env                     # Configuration
 │
-├── docker-compose.yml           # Docker orchestration
+├── start-backend.sh             # Auto-start backend (Linux/Mac)
+├── start-frontend.sh            # Auto-start frontend (Linux/Mac)
+├── start-all.sh                 # Start everything (Linux/Mac)
+├── SIMPLE-START.md              # Easiest setup guide
+├── START.md                     # Detailed setup guide
 └── README.md                    # This file
 ```
 
-## Database Schema (MongoDB)
+---
+
+## 🎯 API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/student/register` | Register new student |
+| POST | `/api/auth/student/login` | Student login |
+| POST | `/api/auth/staff/login` | Staff/Admin login |
+| POST | `/api/auth/refresh` | Refresh access token |
+| POST | `/api/auth/logout` | Logout |
+| GET | `/api/auth/me` | Get current user |
+| GET | `/api/health` | Health check |
+
+### Example: Register Student
+```bash
+curl -X POST http://localhost:5000/api/auth/student/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "roll_no": "CS2021001",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "course": "BCA",
+    "semester": 1
+  }'
+```
+
+### Example: Student Login
+```bash
+curl -X POST http://localhost:5000/api/auth/student/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "roll_no": "CS2021001",
+    "password": "password123"
+  }'
+```
+
+**Full Swagger Documentation:** http://localhost:5000/api/docs
+
+---
+
+## 💾 Database Schema (MongoDB)
 
 ### Students Collection
 ```javascript
@@ -317,12 +209,12 @@ NextGen/
   password_hash: String,  // Bcrypt hashed
   course: String,         // BCA, BCom, BA, BSc, BBM
   semester: Number,       // 1-8
-  batch: String,          // e.g., "2021-2024"
-  student_img: String,    // URL or null
-  about_student: String,  // Bio or null
-  mob_no: String,         // Mobile number or null
+  batch: String,
+  student_img: String,
+  about_student: String,
+  mob_no: String,
   status: String,         // "Active" or "Inactive"
-  email_verified: Boolean, // Default: false
+  email_verified: Boolean,
   created_at: Date,
   updated_at: Date
 }
@@ -337,43 +229,53 @@ NextGen/
   email: String,          // Unique, indexed
   password_hash: String,  // Bcrypt hashed
   user_type: String,      // "Staff" or "Admin"
-  user_img: String,       // URL or null
+  user_img: String,
   status: String,         // "Active" or "Inactive"
   created_at: Date,
   updated_at: Date
 }
 ```
 
-## Security Features
+---
 
-- **Bcrypt Password Hashing** (12 rounds)
-- **JWT Authentication** with short-lived access tokens (15 min) and long-lived refresh tokens (7 days)
-- **Role-based Access Control** (Student, Staff, Admin)
-- **CORS Configuration** for secure cross-origin requests
-- **Input Validation** with Zod schemas
-- **MongoDB Unique Indexes** to prevent duplicate accounts
-- **Protected API Routes** with JWT verification
+## 🔒 Security Features
 
-## Development Commands
+- ✅ **Bcrypt Password Hashing** (12 rounds)
+- ✅ **JWT Authentication** (15min access, 7day refresh)
+- ✅ **Role-based Access Control** (Student, Staff, Admin)
+- ✅ **CORS Configuration**
+- ✅ **Input Validation** (Zod schemas)
+- ✅ **MongoDB Unique Indexes**
+- ✅ **Protected API Routes**
+
+---
+
+## 🛠️ Development Commands
 
 ### Backend
 ```bash
+cd NextGen/backend
+
 # Install dependencies
 pip install -r requirements.txt
 
-# Run development server
-python wsgi.py
+# Setup database (creates admin user)
+python setup.py
 
-# Run with auto-reload (Flask debug mode)
-FLASK_ENV=development python wsgi.py
+# Start development server
+python run.py
+
+# The server auto-reloads when you change Python files
 ```
 
 ### Frontend
 ```bash
+cd NextGen/frontend
+
 # Install dependencies
 npm install
 
-# Run development server
+# Start development server
 npm run dev
 
 # Build for production
@@ -381,95 +283,113 @@ npm run build
 
 # Preview production build
 npm run preview
-
-# Lint code
-npm run lint
 ```
 
-### Docker
+### Using Shell Scripts (Linux/Mac)
 ```bash
-# Build and start all services
-docker-compose up --build
+cd NextGen
 
-# Start in detached mode
-docker-compose up -d
+# Make scripts executable (first time only)
+chmod +x *.sh
 
-# Stop all services
-docker-compose down
+# Start backend
+./start-backend.sh
 
-# View logs
-docker-compose logs -f
+# Start frontend (in new terminal)
+./start-frontend.sh
 
-# Rebuild specific service
-docker-compose up --build backend
-docker-compose up --build frontend
-
-# Execute command in container
-docker exec -it chronicle_backend bash
-docker exec -it chronicle_frontend sh
+# Or start everything at once
+./start-all.sh
 ```
 
-## Troubleshooting
+---
 
-### MongoDB Connection Issues
+## ⚠️ Troubleshooting
+
+### MongoDB Connection Failed
+```
+❌ Failed to connect to MongoDB
+```
+
+**Solution:**
 ```bash
 # Check if MongoDB is running
-docker ps | grep mongo
+mongosh
 
-# Check MongoDB logs
-docker logs chronicle_mongo
+# If not, start MongoDB:
+# macOS:
+brew services start mongodb-community
 
-# Access MongoDB shell
-docker exec -it chronicle_mongo mongosh chronicle_db
+# Ubuntu:
+sudo systemctl start mongod
 
-# List all databases
-show dbs
-
-# List collections in chronicle_db
-use chronicle_db
-show collections
+# Check status:
+brew services list | grep mongodb     # macOS
+sudo systemctl status mongod          # Ubuntu
 ```
 
-### Backend Not Starting
+### Port Already in Use (5000)
+```
+Address already in use: Port 5000
+```
+
+**Solution:**
 ```bash
-# Check backend logs
-docker logs chronicle_backend
+# Find and kill the process
+lsof -ti:5000 | xargs kill -9
 
-# Rebuild backend
-docker-compose up --build backend
-
-# Check if port 5000 is already in use
-lsof -i :5000
+# Or use a different port by editing backend/.env:
+# Change port in run.py if needed
 ```
 
-### Frontend Not Loading
+### Module Not Found
+```
+ModuleNotFoundError: No module named 'flask'
+```
+
+**Solution:**
 ```bash
-# Check frontend logs
-docker logs chronicle_frontend
-
-# Rebuild frontend
-docker-compose up --build frontend
-
-# Check if port 5173 is already in use
-lsof -i :5173
-
-# Clear npm cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
+cd NextGen/backend
+pip install -r requirements.txt
 ```
 
-### CORS Errors
-- Ensure `CORS_ORIGINS` in backend `.env` includes your frontend URL
-- Check that frontend is making requests to the correct API URL
+### CORS Error in Browser
+```
+Access-Control-Allow-Origin error
+```
 
-### Authentication Issues
-- Clear browser local storage
-- Check that JWT_SECRET_KEY is set in backend `.env`
-- Verify tokens are being sent in Authorization header
+**Solution:**
+- Ensure backend is running on http://localhost:5000
+- Check `frontend/.env` has: `VITE_API_BASE_URL=http://localhost:5000/api`
+- Restart both servers
 
-## Testing the Application
+### Admin Login Not Working
+**Solution:**
+Run the setup script to create admin user:
+```bash
+cd NextGen/backend
+python setup.py
+```
 
-### 1. Test Student Registration
+Default admin credentials:
+- Login ID: `admin001`
+- Password: `admin123`
+
+---
+
+## 📚 Additional Documentation
+
+- **[SIMPLE-START.md](SIMPLE-START.md)** - Super simple 3-step setup
+- **[START.md](START.md)** - Detailed setup instructions
+- **[10-PHASE-RECREATION-PLAN.md](10-PHASE-RECREATION-PLAN.md)** - Complete 10-phase roadmap
+
+---
+
+## 🧪 Testing the API
+
+### Using curl
+
+**Register Student:**
 ```bash
 curl -X POST http://localhost:5000/api/auth/student/register \
   -H "Content-Type: application/json" \
@@ -483,7 +403,7 @@ curl -X POST http://localhost:5000/api/auth/student/register \
   }'
 ```
 
-### 2. Test Student Login
+**Student Login:**
 ```bash
 curl -X POST http://localhost:5000/api/auth/student/login \
   -H "Content-Type: application/json" \
@@ -493,34 +413,91 @@ curl -X POST http://localhost:5000/api/auth/student/login \
   }'
 ```
 
-### 3. Test Protected Endpoint
+**Get Current User:**
 ```bash
-# Save token from login response
-TOKEN="<your_access_token>"
+# Save the access_token from login response
+TOKEN="your_access_token_here"
 
 curl -X GET http://localhost:5000/api/auth/me \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-## Next Steps (Phase 2)
+### Using Swagger UI
+Visit http://localhost:5000/api/docs for interactive API testing!
+
+---
+
+## 🐳 Docker Setup (Optional)
+
+If you prefer Docker, see [Docker instructions](docker-compose.yml):
+
+```bash
+# Start all services with Docker
+docker-compose up --build
+
+# Frontend: http://localhost:5173
+# Backend: http://localhost:5000
+```
+
+---
+
+## 🎯 Next Steps (Phase 2)
 
 Phase 2 will implement:
-- ✨ User profile management with avatar upload
+- ✨ User profile management
+- ✨ Avatar upload
 - ✨ Student CRUD operations (Admin)
 - ✨ User management (Admin)
 - ✨ Advanced search and filtering
-- ✨ File upload with S3/MinIO integration
-- ✨ Profile edit functionality
+- ✨ File upload with S3/MinIO
 
-## Contributing
+See [10-PHASE-RECREATION-PLAN.md](10-PHASE-RECREATION-PLAN.md) for the complete roadmap.
 
-Follow the 10-phase plan in `10-PHASE-RECREATION-PLAN.md` for systematic development.
+---
 
-## License
+## 💡 Tips
+
+- Backend auto-reloads when you edit Python files (Flask debug mode)
+- Frontend has Hot Module Replacement (instant updates)
+- Use MongoDB Compass to view/edit database visually
+- Check browser console (F12) for frontend errors
+- Check terminal for backend errors
+
+---
+
+## 📝 Environment Variables
+
+### Backend (.env)
+```env
+FLASK_ENV=development
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB_NAME=chronicle_db
+JWT_SECRET_KEY=your-secret-key
+SECRET_KEY=your-secret-key
+CORS_ORIGINS=http://localhost:5173
+```
+
+### Frontend (.env)
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+---
+
+## 🤝 Contributing
+
+Follow the 10-phase plan for systematic development.
+
+---
+
+## 📄 License
 
 Educational project for Chronicle College Social Network modernization.
 
 ---
 
-**Phase 1 Status:** ✅ Complete
-**Next Phase:** Phase 2 - User Management & Profiles
+**Phase 1 Status:** ✅ **COMPLETE**
+
+**Simple commands. No Docker needed. Just Python! 🐍**
+
+Start coding: `python run.py` 🚀

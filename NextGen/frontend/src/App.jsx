@@ -18,6 +18,10 @@ import UserProfile from './features/profile/UserProfile'
 import StudentManagement from './features/admin/StudentManagement'
 import UserManagement from './features/admin/UserManagement'
 
+// Course/Subject Pages (Phase 3)
+import CourseManagement from './features/courses/CourseManagement'
+import SubjectManagement from './features/subjects/SubjectManagement'
+
 // Layout
 import MainLayout from './components/layout/MainLayout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
@@ -61,6 +65,10 @@ function App() {
         {/* Phase 2: Admin Management (Admin only) */}
         <Route path="admin/students" element={<StudentManagement />} />
         <Route path="admin/users" element={<UserManagement />} />
+
+        {/* Phase 3: Course & Subject Management (Staff/Admin) */}
+        <Route path="courses" element={<CourseManagement />} />
+        <Route path="subjects" element={<SubjectManagement />} />
 
         {/* More routes will be added in subsequent phases */}
       </Route>

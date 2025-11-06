@@ -53,11 +53,13 @@ def create_app(config_name='development'):
     )
 
     # Register blueprints
-    from app.blueprints import auth, students, users
+    from app.blueprints import auth, students, users, courses, subjects
 
     api.add_namespace(auth.api, path='/auth')
     api.add_namespace(students.api, path='/students')
     api.add_namespace(users.api, path='/users')
+    api.add_namespace(courses.api, path='/courses')
+    api.add_namespace(subjects.api, path='/subjects')
 
     # Health check endpoint
     @app.route('/api/health')

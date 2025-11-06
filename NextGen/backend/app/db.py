@@ -32,4 +32,14 @@ def init_db(app):
         db.users.create_index('login_id', unique=True)
         db.users.create_index('email', unique=True)
 
+        # Create indexes for courses collection
+        db.courses.create_index('course_code', unique=True)
+        db.courses.create_index('course_name', unique=True)
+
+        # Create indexes for subjects collection
+        db.subjects.create_index('subject_code')
+        db.subjects.create_index('course_id')
+        db.subjects.create_index('semester')
+        db.subjects.create_index([('course_id', 1), ('subject_code', 1)], unique=True)
+
         print("Database indexes created successfully")

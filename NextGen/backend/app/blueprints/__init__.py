@@ -1,4 +1,4 @@
 """API blueprints."""
-from app.blueprints import auth, students, users
+from app.blueprints import auth, students, users, courses, subjects
 
-__all__ = ['auth', 'students', 'users']
+__all__ = ['auth', 'students', 'users', 'courses', 'subjects']

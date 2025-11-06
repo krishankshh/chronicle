@@ -3,9 +3,9 @@ import os
 from flask import Flask, send_from_directory
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from flask_mail import Mail
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+# from flask_mail import Mail
+# from flask_limiter import Limiter
+# from flask_limiter.util import get_remote_address
 from flask_restx import Api
 
 from app.config import config
@@ -13,8 +13,8 @@ from app.db import close_db, init_db
 
 # Initialize extensions
 jwt = JWTManager()
-mail = Mail()
-limiter = Limiter(key_func=get_remote_address)
+# mail = Mail()
+# limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(config_name='development'):
@@ -30,8 +30,8 @@ def create_app(config_name='development'):
 
     # Initialize extensions with app
     jwt.init_app(app)
-    mail.init_app(app)
-    limiter.init_app(app)
+    # mail.init_app(app)  # Disabled for Phase 2 testing
+    # limiter.init_app(app)  # Disabled for Phase 2 testing
 
     # Register database teardown
     app.teardown_appcontext(close_db)

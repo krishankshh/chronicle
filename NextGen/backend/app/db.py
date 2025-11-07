@@ -96,4 +96,13 @@ def init_db(app):
         db.timeline_comments.create_index('post_id')
         db.timeline_comments.create_index([('created_at', 1)])
 
+        # Certificate indexes
+        db.certificate_types.create_index('certificate_type', unique=True)
+        db.certificate_types.create_index('status')
+        db.certificates.create_index('student_id')
+        db.certificates.create_index('certificate_type_id')
+        db.certificates.create_index('status')
+        db.certificates.create_index([('student_id', 1), ('certificate_type_id', 1)])
+        db.certificates.create_index([('issue_date', -1)])
+
         print("Database indexes created successfully")

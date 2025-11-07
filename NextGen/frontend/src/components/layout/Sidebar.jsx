@@ -13,6 +13,7 @@ import {
   UserCog,
   BarChart3,
   FileSpreadsheet,
+  Award,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import useAuthStore from '../../store/authStore'
@@ -30,6 +31,7 @@ export default function Sidebar() {
     { name: 'Discussions', href: '/discussions', icon: MessageSquare },
     { name: 'Notices', href: '/notices', icon: Calendar },
     { name: 'Timeline', href: '/timeline', icon: Image },
+    { name: 'My Certificates', href: '/my-certificates', icon: Award },
     { name: 'Chat', href: '/chat', icon: MessagesSquare },
   ]
 
@@ -43,6 +45,7 @@ export default function Sidebar() {
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Subjects', href: '/subjects', icon: FileText },
     { name: 'Study Materials', href: '/materials', icon: FileText },
+    { name: 'Certificates', href: '/certificates', icon: FileText },
     { name: 'Quizzes', href: '/quizzes', icon: ClipboardList },
     { name: 'Manage Materials', href: '/admin/materials', icon: ClipboardList },
     { name: 'Manage Quizzes', href: '/admin/quizzes', icon: ClipboardList },
@@ -63,6 +66,8 @@ export default function Sidebar() {
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Subjects', href: '/subjects', icon: FileText },
     { name: 'Study Materials', href: '/materials', icon: FileText },
+    { name: 'Certificates', href: '/certificates', icon: FileText },
+    { name: 'Certificate Types', href: '/certificate-types', icon: Award },
     { name: 'Quizzes', href: '/quizzes', icon: ClipboardList },
     { name: 'Manage Materials', href: '/admin/materials', icon: ClipboardList },
     { name: 'Manage Quizzes', href: '/admin/quizzes', icon: ClipboardList },

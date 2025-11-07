@@ -9,6 +9,7 @@ from app.models.quiz import QuizHelper, QuestionHelper, QuizAttemptHelper
 from app.models.discussion import DiscussionHelper, DiscussionReplyHelper
 from app.models.chat import ChatSessionHelper, GroupChatHelper, ChatMessageHelper, save_chat_attachment
 from app.models.timeline import TimelinePostHelper, TimelineCommentHelper, build_media_metadata
+from app.models.certificate import CertificateHelper, CertificateTypeHelper
 
 __all__ = [
     'UserHelper',
@@ -29,4 +30,6 @@ __all__ = [
     'TimelinePostHelper',
     'TimelineCommentHelper',
     'build_media_metadata',
+    'CertificateHelper',
+    'CertificateTypeHelper',
 ]

@@ -74,6 +74,7 @@ def create_app(config_name='development'):
         timeline,
         admin_dashboard,
         reports,
+        certificates,
     )
 
     api.add_namespace(auth.api, path='/auth')
@@ -89,6 +90,7 @@ def create_app(config_name='development'):
     api.add_namespace(timeline.api, path='/timeline')
     api.add_namespace(admin_dashboard.api, path='/admin')
     api.add_namespace(reports.api, path='/reports')
+    api.add_namespace(certificates.api, path='/certificates')
 
     # Health check endpoint
     @app.route('/api/health')

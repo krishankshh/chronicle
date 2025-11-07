@@ -13,6 +13,7 @@ from app.blueprints import (
     timeline,
     admin_dashboard,
     reports,
+    certificates,
 )
 
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     'timeline',
     'admin_dashboard',
     'reports',
+    'certificates',
 ]

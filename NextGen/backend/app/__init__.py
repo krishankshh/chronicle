@@ -60,7 +60,21 @@ def create_app(config_name='development'):
     )
 
     # Register blueprints
-    from app.blueprints import auth, students, users, courses, subjects, notices, materials, quizzes, discussions, chats, timeline
+    from app.blueprints import (
+        auth,
+        students,
+        users,
+        courses,
+        subjects,
+        notices,
+        materials,
+        quizzes,
+        discussions,
+        chats,
+        timeline,
+        admin_dashboard,
+        reports,
+    )
 
     api.add_namespace(auth.api, path='/auth')
     api.add_namespace(students.api, path='/students')
@@ -73,6 +87,8 @@ def create_app(config_name='development'):
     api.add_namespace(discussions.api, path='/discussions')
     api.add_namespace(chats.api, path='/chats')
     api.add_namespace(timeline.api, path='/timeline')
+    api.add_namespace(admin_dashboard.api, path='/admin')
+    api.add_namespace(reports.api, path='/reports')
 
     # Health check endpoint
     @app.route('/api/health')

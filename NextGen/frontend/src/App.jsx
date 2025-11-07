@@ -52,6 +52,10 @@ import QuizForm from './features/quizzes/QuizForm'
 import QuizQuestionManager from './features/quizzes/QuizQuestionManager'
 import QuizAnalytics from './features/quizzes/QuizAnalytics'
 import ChatPage from './features/chat/ChatPage'
+import TimelinePage from './features/timeline/TimelinePage'
+import AdminDashboard from './features/admin/AdminDashboard'
+import AnalyticsPage from './features/analytics/AnalyticsPage'
+import ReportsPage from './features/analytics/ReportsPage'
 
 function App() {
   const { isAuthenticated, getCurrentUser } = useAuthStore()
@@ -131,6 +135,14 @@ function App() {
 
         {/* Phase 8: Real-time Chat */}
         <Route path="chat" element={<ChatPage />} />
+
+        {/* Phase 9: Social Timeline */}
+        <Route path="timeline" element={<TimelinePage />} />
+
+        {/* Phase 10: Admin Analytics & Reports */}
+        <Route path="admin/dashboard" element={<AdminDashboard />} />
+        <Route path="admin/analytics" element={<AnalyticsPage />} />
+        <Route path="admin/reports" element={<ReportsPage />} />
 
         {/* More routes will be added in subsequent phases */}
       </Route>

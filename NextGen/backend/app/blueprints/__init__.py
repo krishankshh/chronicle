@@ -11,6 +11,8 @@ from app.blueprints import (
     discussions,
     chats,
     timeline,
+    admin_dashboard,
+    reports,
 )
 
 __all__ = [
@@ -25,4 +27,6 @@ __all__ = [
     'discussions',
     'chats',
     'timeline',
+    'admin_dashboard',
+    'reports',
 ]

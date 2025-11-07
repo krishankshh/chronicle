@@ -10,7 +10,9 @@ import {
   MessagesSquare,
   Image,
   UserCircle,
-  UserCog
+  UserCog,
+  BarChart3,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import useAuthStore from '../../store/authStore'
@@ -33,7 +35,10 @@ export default function Sidebar() {
 
   const staffNav = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Admin Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'My Profile', href: '/profile/user', icon: UserCircle },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Reports', href: '/admin/reports', icon: FileSpreadsheet },
     { name: 'Students', href: '/students', icon: Users },
     { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'Subjects', href: '/subjects', icon: FileText },
@@ -42,13 +47,17 @@ export default function Sidebar() {
     { name: 'Manage Materials', href: '/admin/materials', icon: ClipboardList },
     { name: 'Manage Quizzes', href: '/admin/quizzes', icon: ClipboardList },
     { name: 'Discussions', href: '/discussions', icon: MessageSquare },
+    { name: 'Timeline', href: '/timeline', icon: Image },
     { name: 'Notices', href: '/notices', icon: Calendar },
     { name: 'Manage Notices', href: '/admin/notices', icon: FileText },
   ]
 
   const adminNav = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Admin Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'My Profile', href: '/profile/user', icon: UserCircle },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Reports', href: '/admin/reports', icon: FileSpreadsheet },
     { name: 'Manage Students', href: '/admin/students', icon: Users },
     { name: 'Manage Users', href: '/admin/users', icon: UserCog },
     { name: 'Courses', href: '/courses', icon: BookOpen },
@@ -58,6 +67,7 @@ export default function Sidebar() {
     { name: 'Manage Materials', href: '/admin/materials', icon: ClipboardList },
     { name: 'Manage Quizzes', href: '/admin/quizzes', icon: ClipboardList },
     { name: 'Discussions', href: '/discussions', icon: MessageSquare },
+    { name: 'Timeline', href: '/timeline', icon: Image },
     { name: 'Notices', href: '/notices', icon: Calendar },
     { name: 'Manage Notices', href: '/admin/notices', icon: FileText },
   ]

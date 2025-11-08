@@ -9,7 +9,7 @@ from flask_restx import Api
 
 from app.config import config
 from app.db import close_db, init_db
-from app.extensions import socketio, mail
+from app.extensions import socketio
 from app.socketio_handlers import register_socketio_events
 
 # Initialize extensions
@@ -35,7 +35,6 @@ def create_app(config_name='development'):
 
     # Initialize extensions with app
     jwt.init_app(app)
-    mail.init_app(app)
     # limiter.init_app(app)  # Disabled for Phase 2 testing
 
     # Register database teardown

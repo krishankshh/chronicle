@@ -43,13 +43,9 @@ class Config:
     S3_REGION = os.getenv('S3_REGION', 'us-east-1')
     MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'http://localhost:9000')
 
-    # Email
-    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
-    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'True').lower() == 'true'
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@chronicle.com')
+    # Email - Resend
+    RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'chronicle@kmats.in')
 
     # API Documentation
     API_TITLE = os.getenv('API_TITLE', 'Chronicle API')

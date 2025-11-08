@@ -1,13 +1,12 @@
-"""Email helper utilities."""
+"""Email helper utilities using Resend."""
 from __future__ import annotations
 
+import os
 import re
 from typing import List, Sequence, Union
 
+import resend
 from flask import current_app
-from flask_mail import Message
-
-from app.extensions import mail
 
 RecipientList = Union[str, Sequence[str]]
 
@@ -37,7 +36,7 @@ def _strip_html(html: str) -> str:
 
 
 def send_email(to: RecipientList, subject: str, template: str, **context) -> bool:
-    """Send an HTML email using Flask-Mail."""
+    """Send an HTML email using Resend."""
     recipients = _normalize_recipients(to)
     if not recipients:
         current_app.logger.warning('Email not sent because no recipients were supplied for "%s".', subject)
@@ -46,18 +45,26 @@ def send_email(to: RecipientList, subject: str, template: str, **context) -> boo
     if not current_app:
         return False
 
+    # Set Resend API key
+    resend.api_key = current_app.config.get('RESEND_API_KEY')
+
+    # Get sender email
+    sender = current_app.config.get('MAIL_DEFAULT_SENDER', 'chronicle@kmats.in')
+
+    # Render template
     body = _render_template(template, **context)
-    msg = Message(
-        subject=subject,
-        recipients=recipients,
-        sender=current_app.config.get('MAIL_DEFAULT_SENDER'),
-    )
-    msg.html = body
-    msg.body = _strip_html(body)
 
     try:
-        mail.send(msg)
-        current_app.logger.info('Sent email "%s" to %s recipients.', subject, len(recipients))
+        # Send email via Resend
+        params = {
+            "from": sender,
+            "to": recipients,
+            "subject": subject,
+            "html": body,
+        }
+
+        response = resend.Emails.send(params)
+        current_app.logger.info('Sent email "%s" to %s recipients. Response: %s', subject, len(recipients), response)
         return True
     except Exception as exc:  # pragma: no cover - logging only
         current_app.logger.error('Failed to send email "%s": %s', subject, exc)

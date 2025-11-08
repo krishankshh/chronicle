@@ -1,4 +1,6 @@
 """Authentication endpoints."""
+import secrets
+from datetime import datetime, timedelta
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
@@ -6,7 +8,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from app.db import get_db
 from app.models.student import StudentHelper
 from app.models.user import UserHelper
-from app.utils.email import send_welcome_email
+from app.utils.email import send_welcome_email, send_password_reset_email
 
 api = Namespace('auth', description='Authentication operations')
 
@@ -30,6 +32,16 @@ student_login_model = api.model('StudentLogin', {
 staff_login_model = api.model('StaffLogin', {
     'login_id': fields.String(required=True, description='Staff login ID'),
     'password': fields.String(required=True, description='Password'),
+})
+
+forgot_password_model = api.model('ForgotPassword', {
+    'email': fields.String(required=True, description='Email address'),
+    'user_type': fields.String(required=False, description='User type: student or staff', enum=['student', 'staff']),
+})
+
+reset_password_model = api.model('ResetPassword', {
+    'token': fields.String(required=True, description='Password reset token'),
+    'new_password': fields.String(required=True, description='New password'),
 })
 
 
@@ -242,3 +254,122 @@ class CurrentUser(Resource):
                 'user': UserHelper.to_dict(user),
                 'role': role
             }, 200
+
+
+@api.route('/forgot-password')
+class ForgotPassword(Resource):
+    """Forgot password endpoint."""
+
+    @api.doc('forgot_password')
+    @api.expect(forgot_password_model)
+    def post(self):
+        """Request password reset token via email."""
+        data = request.get_json()
+        db = get_db()
+
+        if not data.get('email'):
+            return {'success': False, 'message': 'Email is required'}, 400
+
+        email = data['email']
+        user_type = data.get('user_type', 'student')  # Default to student
+
+        # Find user by email
+        account = None
+        name = None
+        if user_type == 'student':
+            account = StudentHelper.find_by_email(db, email)
+            name = account.get('name') if account else None
+        else:
+            # For staff, find by email
+            account = db.users.find_one({'email': email, 'status': 'Active'})
+            name = account.get('name') if account else None
+
+        # Always return success to prevent email enumeration
+        if not account:
+            return {
+                'success': True,
+                'message': 'If your email is registered, you will receive password reset instructions'
+            }, 200
+
+        # Generate reset token
+        reset_token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=1)  # Token valid for 1 hour
+
+        # Store reset token
+        db.password_reset_tokens.insert_one({
+            'email': email,
+            'token': reset_token,
+            'user_type': user_type,
+            'expires_at': expires_at,
+            'used': False,
+            'created_at': datetime.utcnow()
+        })
+
+        # Send reset email
+        send_password_reset_email(email, name, reset_token)
+
+        return {
+            'success': True,
+            'message': 'If your email is registered, you will receive password reset instructions'
+        }, 200
+
+
+@api.route('/reset-password')
+class ResetPassword(Resource):
+    """Reset password endpoint."""
+
+    @api.doc('reset_password')
+    @api.expect(reset_password_model)
+    def post(self):
+        """Reset password using token."""
+        data = request.get_json()
+        db = get_db()
+
+        if not data.get('token') or not data.get('new_password'):
+            return {'success': False, 'message': 'Token and new password are required'}, 400
+
+        token = data['token']
+        new_password = data['new_password']
+
+        # Validate password length
+        if len(new_password) < 8:
+            return {'success': False, 'message': 'Password must be at least 8 characters long'}, 400
+
+        # Find token
+        token_doc = db.password_reset_tokens.find_one({
+            'token': token,
+            'used': False,
+            'expires_at': {'$gt': datetime.utcnow()}
+        })
+
+        if not token_doc:
+            return {'success': False, 'message': 'Invalid or expired reset token'}, 400
+
+        email = token_doc['email']
+        user_type = token_doc['user_type']
+
+        # Update password
+        try:
+            if user_type == 'student':
+                student = StudentHelper.find_by_email(db, email)
+                if not student:
+                    return {'success': False, 'message': 'Account not found'}, 404
+                StudentHelper.update_password(db, str(student['_id']), new_password)
+            else:
+                user = db.users.find_one({'email': email, 'status': 'Active'})
+                if not user:
+                    return {'success': False, 'message': 'Account not found'}, 404
+                UserHelper.update_password(db, str(user['_id']), new_password)
+
+            # Mark token as used
+            db.password_reset_tokens.update_one(
+                {'_id': token_doc['_id']},
+                {'$set': {'used': True, 'used_at': datetime.utcnow()}}
+            )
+
+            return {
+                'success': True,
+                'message': 'Password reset successfully'
+            }, 200
+        except Exception as e:
+            return {'success': False, 'message': f'Password reset failed: {str(e)}'}, 500

@@ -6,6 +6,13 @@ import useAuthStore from './store/authStore'
 import StudentLogin from './features/auth/StudentLogin'
 import StaffLogin from './features/auth/StaffLogin'
 import StudentRegister from './features/auth/StudentRegister'
+import ForgotPassword from './features/auth/ForgotPassword'
+import ResetPassword from './features/auth/ResetPassword'
+
+// Public Pages
+import AboutPage from './features/public/AboutPage'
+import ContactPage from './features/public/ContactPage'
+import NotFoundPage from './features/public/NotFoundPage'
 
 // Dashboard
 import Dashboard from './features/dashboard/Dashboard'
@@ -79,6 +86,10 @@ function App() {
       <Route path="/login" element={<StudentLogin />} />
       <Route path="/staff-login" element={<StaffLogin />} />
       <Route path="/register" element={<StudentRegister />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
       {/* Protected routes */}
       <Route
@@ -153,8 +164,8 @@ function App() {
         {/* More routes will be added in subsequent phases */}
       </Route>
 
-      {/* Catch all */}
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+      {/* Catch all - 404 */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

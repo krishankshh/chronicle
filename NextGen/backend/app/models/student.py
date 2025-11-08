@@ -56,6 +56,21 @@ class StudentHelper:
         return bcrypt.checkpw(password.encode('utf-8'), student['password_hash'].encode('utf-8'))
 
     @staticmethod
+    def update_password(db, student_id, new_password):
+        """Update student password."""
+        password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        db.students.update_one(
+            {'_id': ObjectId(student_id)},
+            {
+                '$set': {
+                    'password_hash': password_hash,
+                    'updated_at': datetime.utcnow()
+                }
+            }
+        )
+        return True
+
+    @staticmethod
     def to_dict(student):
         """Convert student document to dictionary."""
         if not student:

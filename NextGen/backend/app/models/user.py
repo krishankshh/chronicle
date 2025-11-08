@@ -51,6 +51,21 @@ class UserHelper:
         return bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8'))
 
     @staticmethod
+    def update_password(db, user_id, new_password):
+        """Update user password."""
+        password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        db.users.update_one(
+            {'_id': ObjectId(user_id)},
+            {
+                '$set': {
+                    'password_hash': password_hash,
+                    'updated_at': datetime.utcnow()
+                }
+            }
+        )
+        return True
+
+    @staticmethod
     def to_dict(user):
         """Convert user document to dictionary."""
         if not user:

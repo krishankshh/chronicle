@@ -85,17 +85,20 @@ def send_welcome_email(student_email: str, student_name: str) -> bool:
     )
 
 
-def send_password_reset_email(email: str, reset_token: str, student_name: str) -> bool:
+def send_password_reset_email(email: str, name: str, reset_token: str) -> bool:
     template = """
     <html>
         <body style="font-family: Arial, sans-serif; padding: 20px;">
             <h2>Password Reset Request</h2>
             <p>Dear {name},</p>
-            <p>You have requested to reset your password. Use the following code to reset your password:</p>
-            <h3 style="background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 24px; letter-spacing: 5px;">
-                {token}
-            </h3>
-            <p>This code will expire in 15 minutes.</p>
+            <p>You have requested to reset your password. Use the following token to reset your password:</p>
+            <div style="background-color: #f0f0f0; padding: 20px; margin: 20px 0; border-radius: 5px;">
+                <p style="margin: 0; font-size: 14px; color: #666;">Reset Token:</p>
+                <p style="margin: 10px 0 0 0; font-family: monospace; font-size: 16px; word-break: break-all;">
+                    {token}
+                </p>
+            </div>
+            <p><strong>This token will expire in 1 hour.</strong></p>
             <p>If you did not request this reset, please ignore this email.</p>
             <br>
             <p>Best regards,<br>Chronicle College Administration</p>
@@ -106,7 +109,7 @@ def send_password_reset_email(email: str, reset_token: str, student_name: str) -
         email,
         'Password Reset Request - Chronicle College',
         template,
-        name=student_name,
+        name=name,
         token=reset_token,
     )
 

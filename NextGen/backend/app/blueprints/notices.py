@@ -11,6 +11,12 @@ from app.db import get_db
 from app.models.notice import NoticeHelper
 from app.utils.decorators import staff_required
 from app.utils.file_handler import FileHandler
+from app.utils.email import send_notice_email
+from app.utils.notification_helpers import (
+    get_student_recipients,
+    get_staff_recipients,
+    combine_recipients,
+)
 
 api = Namespace('notices', description='Notice management operations')
 
@@ -113,6 +119,30 @@ def _is_staff_or_admin(claims):
     return claims.get('role') in {'staff', 'admin'}
 
 
+def _notify_notice_publication(db, notice):
+    if not notice or notice.get('status') != 'published':
+        return
+
+    student_recipients = get_student_recipients(db, fallback_to_all=True)
+    staff_recipients = get_staff_recipients(db)
+    recipients = combine_recipients(student_recipients, staff_recipients)
+
+    if not recipients:
+        current_app.logger.info('No recipients available for notice "%s".', notice.get('title'))
+        return
+
+    notice_type = (notice.get('type') or 'Notice').title()
+    title = notice.get('title', 'New Notice')
+
+    for recipient in recipients:
+        send_notice_email(
+            recipient['email'],
+            recipient.get('name', 'Chronicle Member'),
+            title,
+            notice_type,
+        )
+
+
 def _apply_public_filters(filters):
     now = datetime.now(timezone.utc)
     filters.setdefault('status', 'published')
@@ -213,6 +243,7 @@ class NoticeList(Resource):
     def post(self):
         """Create a new notice (staff/admin only)."""
         data = request.get_json() or {}
+        db = get_db()
 
         title = (data.get('title') or '').strip()
         content = data.get('content')
@@ -243,7 +274,7 @@ class NoticeList(Resource):
         created_by = claims.get('user_id')
 
         notice = NoticeHelper.create_notice(
-            get_db(),
+            db,
             title=title,
             content=content,
             notice_type=notice_type,
@@ -255,6 +286,8 @@ class NoticeList(Resource):
             attachments=data.get('attachments') or [],
             created_by=created_by
         )
+
+        _notify_notice_publication(db, notice)
 
         return _serialize_notice(notice), 201
 

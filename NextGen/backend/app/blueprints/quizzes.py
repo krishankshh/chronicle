@@ -2,13 +2,19 @@
 import random
 from datetime import datetime, timezone
 
-from flask import request
+from flask import request, current_app
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt
 
 from app.db import get_db
 from app.models.quiz import QuizHelper, QuestionHelper, QuizAttemptHelper, evaluate_answers
 from app.utils.decorators import staff_required, student_required
+from app.utils.email import send_quiz_published_email
+from app.utils.notification_helpers import (
+    resolve_course_name,
+    resolve_subject_name,
+    get_student_recipients,
+)
 
 api = Namespace('quizzes', description='Quiz management and assessment')
 
@@ -125,6 +131,36 @@ def _get_claims():
         return {}
 
 
+def _notify_quiz_publication(db, quiz):
+    """Send notifications when a quiz becomes published."""
+    if not quiz or quiz.get('status') != 'published':
+        return
+
+    course_name = resolve_course_name(db, quiz.get('course_id'))
+    subject_name = resolve_subject_name(db, quiz.get('subject_id'))
+    recipients = get_student_recipients(
+        db,
+        course_name=course_name,
+        semester=quiz.get('semester'),
+        fallback_to_all=True,
+    )
+    if not recipients:
+        current_app.logger.info(
+            'No student recipients found for quiz %s publication email.',
+            str(quiz.get('_id')),
+        )
+        return
+
+    subject_display = subject_name or course_name or 'your course'
+    for student in recipients:
+        send_quiz_published_email(
+            student['email'],
+            student.get('name', 'Student'),
+            quiz.get('title', 'New Quiz'),
+            subject_display,
+        )
+
+
 @api.route('')
 @api.route('/')
 class QuizList(Resource):
@@ -215,8 +251,9 @@ class QuizList(Resource):
 
         claims = get_jwt()
 
+        db = get_db()
         quiz = QuizHelper.create_quiz(
-            get_db(),
+            db,
             title=title,
             description=data.get('description'),
             course_id=data.get('course_id'),
@@ -228,6 +265,7 @@ class QuizList(Resource):
             allow_multiple_attempts=data.get('allow_multiple_attempts', False),
             created_by=claims.get('user_id')
         )
+        _notify_quiz_publication(db, quiz)
         return QuizHelper.to_dict(quiz), 201
 
 
@@ -249,6 +287,9 @@ class QuizDetail(Resource):
     def put(self, quiz_id):
         data = request.get_json() or {}
         db = get_db()
+        existing = QuizHelper.find_by_id(db, quiz_id)
+        if not existing:
+            api.abort(404, 'Quiz not found.')
 
         update_payload = {}
         for field in ['title', 'description', 'course_id', 'subject_id', 'semester',
@@ -264,6 +305,10 @@ class QuizDetail(Resource):
 
         if not updated:
             api.abort(404, 'Quiz not found.')
+
+        if existing.get('status') != 'published' and updated.get('status') == 'published':
+            _notify_quiz_publication(db, updated)
+
         return QuizHelper.to_dict(updated)
 
     @jwt_required()

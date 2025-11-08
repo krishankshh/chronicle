@@ -1,7 +1,8 @@
 """Certificate management endpoints."""
+import os
 from datetime import datetime
 
-from flask import request
+from flask import current_app, request, send_file
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import get_jwt, jwt_required
 from bson import ObjectId
@@ -10,6 +11,8 @@ from bson.errors import InvalidId
 from app.db import get_db
 from app.models.certificate import CertificateHelper, CertificateTypeHelper
 from app.utils.decorators import admin_required, staff_required, student_required
+from app.utils.pdf_generator import CertificatePDF
+from app.utils.email import send_certificate_issued_email
 
 api = Namespace('certificates', description='Certificate management operations')
 
@@ -308,6 +311,14 @@ class CertificateList(Resource):
             student=student,
             certificate_type=certificate_type
         )
+
+        if student.get('email'):
+            send_certificate_issued_email(
+                student['email'],
+                student.get('name', 'Student'),
+                certificate_type.get('certificate_type', 'Certificate')
+            )
+
         return {
             'success': True,
             'message': 'Certificate issued successfully',
@@ -350,6 +361,53 @@ class CertificateDetail(Resource):
                 certificate_type=certificate_type
             )
         }, 200
+
+
+@api.route('/<string:certificate_id>/download')
+class CertificateDownload(Resource):
+    """Generate and download certificate PDF."""
+
+    @api.doc('download_certificate')
+    @jwt_required()
+    def get(self, certificate_id):
+        db = get_db()
+        certificate = CertificateHelper.find_by_id(db, certificate_id)
+        if not certificate:
+            return {'success': False, 'message': 'Certificate not found'}, 404
+
+        claims = get_jwt()
+        if claims.get('role') == 'student' and str(certificate.get('student_id')) != claims.get('user_id'):
+            return {'success': False, 'message': 'Access denied'}, 403
+
+        student = db.students.find_one({'_id': certificate.get('student_id')})
+        cert_type = db.certificate_types.find_one({'_id': certificate.get('certificate_type_id')})
+        if not student or not cert_type:
+            return {'success': False, 'message': 'Invalid certificate data'}, 400
+
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        cert_dir = os.path.join(upload_folder, 'certificates')
+        os.makedirs(cert_dir, exist_ok=True)
+
+        pdf_filename = f"certificate_{certificate_id}.pdf"
+        pdf_path = os.path.join(cert_dir, pdf_filename)
+
+        certificate_pdf = CertificatePDF(pdf_path)
+        certificate_pdf.generate(
+            student.get('name', 'Student'),
+            student.get('roll_no', '-'),
+            student.get('course', '-'),
+            cert_type.get('certificate_type', 'Certificate'),
+            certificate.get('issue_date'),
+            certificate_id,
+        )
+
+        db.certificates.update_one(
+            {'_id': certificate['_id']},
+            {'$set': {'certificate_file': f"/uploads/certificates/{pdf_filename}"}}
+        )
+
+        download_name = f"{student.get('roll_no', 'certificate')}_{cert_type.get('certificate_type', 'Certificate')}.pdf"
+        return send_file(pdf_path, as_attachment=True, download_name=download_name)
 
 
 @api.route('/student/my-certificates')

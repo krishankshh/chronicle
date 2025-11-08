@@ -14,6 +14,8 @@ from app.models.discussion import (
     build_attachment_metadata,
 )
 from app.utils.file_handler import FileHandler
+from app.utils.email import send_discussion_reply_email
+from app.utils.notification_helpers import get_account_contact
 
 api = Namespace('discussions', description='Discussion forum operations')
 
@@ -125,6 +127,27 @@ def _handle_attachments(files):
             api.abort(400, error)
         attachments.append(build_attachment_metadata(file_storage, upload_folder))
     return attachments
+
+
+def _notify_discussion_reply(db, discussion, replier_id, replier_name):
+    owner_id = discussion.get('created_by')
+    owner_role = discussion.get('author_role') or 'student'
+    if not owner_id:
+        return
+
+    if replier_id and str(owner_id) == str(replier_id):
+        return
+
+    contact = get_account_contact(db, owner_id, owner_role)
+    if not contact:
+        return
+
+    send_discussion_reply_email(
+        contact['email'],
+        contact.get('name', 'Member'),
+        discussion.get('title', 'Discussion'),
+        replier_name or 'A classmate',
+    )
 
 
 @api.route('')
@@ -339,6 +362,7 @@ class DiscussionReplyCreate(Resource):
             parent_reply_id=payload.get('parent_reply_id'),
             attachments=attachments
         )
+        _notify_discussion_reply(db, discussion, user_id, name)
         return DiscussionReplyHelper.to_dict(reply)
 
 

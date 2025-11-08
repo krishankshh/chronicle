@@ -24,6 +24,30 @@ const StudentCertificates = () => {
     return parsed.toLocaleDateString()
   }
 
+  const handleDownload = async (certificateId) => {
+    if (!certificateId) {
+      return
+    }
+
+    try {
+      const response = await api.get(`/certificates/${certificateId}/download`, {
+        responseType: 'blob',
+      })
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `certificate_${certificateId}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (downloadError) {
+      console.error('Failed to download certificate', downloadError)
+      alert('Failed to download certificate. Please try again.')
+    }
+  }
+
   if (role !== 'student') {
     return (
       <div className="p-6">
@@ -85,11 +109,11 @@ const StudentCertificates = () => {
               <Button
                 variant="primary"
                 className="w-full"
-                disabled={!cert.certificate_file}
-                title={cert.certificate_file ? 'Download certificate' : 'Download coming soon'}
+                type="button"
+                onClick={() => handleDownload(cert._id)}
               >
                 <Download className="w-4 h-4 mr-2" />
-                {cert.certificate_file ? 'Download Certificate' : 'Download Not Available'}
+                Download Certificate
               </Button>
             </Card>
           ))}

@@ -18,6 +18,12 @@ from app.db import get_db
 from app.models.material import StudyMaterialHelper
 from app.utils.decorators import staff_required
 from app.utils.file_handler import FileHandler
+from app.utils.email import send_study_material_email
+from app.utils.notification_helpers import (
+    resolve_course_name,
+    resolve_subject_name,
+    get_student_recipients,
+)
 
 api = Namespace('materials', description='Study material operations')
 
@@ -109,6 +115,38 @@ def _material_to_dict(material):
     return StudyMaterialHelper.to_dict(material)
 
 
+def _notify_material_upload(db, material):
+    if not material:
+        return
+
+    course_name = resolve_course_name(db, material.get('course_id'))
+    subject_name = resolve_subject_name(db, material.get('subject_id'))
+    semester = material.get('semester')
+
+    recipients = get_student_recipients(
+        db,
+        course_name=course_name,
+        semester=semester,
+        fallback_to_all=True,
+    )
+    if not recipients:
+        current_app.logger.info(
+            'No recipients found for study material notification "%s".',
+            material.get('title'),
+        )
+        return
+
+    subject_label = subject_name or course_name or 'your course'
+    title = material.get('title', 'Study Material')
+    for recipient in recipients:
+        send_study_material_email(
+            recipient['email'],
+            recipient.get('name', 'Student'),
+            title,
+            subject_label,
+        )
+
+
 @api.route('')
 @api.route('/')
 class MaterialList(Resource):
@@ -198,8 +236,9 @@ class MaterialList(Resource):
         claims = get_jwt()
         created_by = claims.get('user_id')
 
+        db = get_db()
         material = StudyMaterialHelper.create_material(
-            get_db(),
+            db,
             title=title,
             description=data.get('description'),
             course_id=data.get('course_id'),
@@ -208,6 +247,8 @@ class MaterialList(Resource):
             tags=data.get('tags') or [],
             created_by=created_by
         )
+
+        _notify_material_upload(db, material)
 
         return _material_to_dict(material), 201
 

@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from app.db import get_db
 from app.models.student import StudentHelper
 from app.models.user import UserHelper
+from app.utils.email import send_welcome_email
 
 api = Namespace('auth', description='Authentication operations')
 
@@ -69,6 +70,8 @@ class StudentRegister(Resource):
                 batch=data.get('batch'),
                 mob_no=data.get('mob_no')
             )
+
+            send_welcome_email(data['email'], data['name'])
 
             return {
                 'success': True,
